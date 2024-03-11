@@ -8,7 +8,7 @@ terraform {
   required_version = ">= 0.13"
 
   backend "s3" {
-    bucket = "terraform-bday-app"
+    bucket = "terraform-btc-app"
     key    = "infra-state"
     region = "us-east-1"
   }
