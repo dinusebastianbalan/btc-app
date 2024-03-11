@@ -58,7 +58,7 @@ variable "private_subnets" {
 variable "database_subnets" {
   description = "A list of database subnets inside the VPC"
   type        = list(string)
-  default     = ["10.0.151.0/24", "10.0.152.0/24"], "10.0.153.0/24"
+  default     = ["10.0.151.0/24", "10.0.152.0/24", "10.0.153.0/24"]
 }
 
 # VPC Create Database Subnet Group (True / False)
