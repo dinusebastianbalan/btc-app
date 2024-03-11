@@ -10,12 +10,13 @@ variable "region" {
 variable "environment" {
   description = "Environment Variable used as a prefix"
   type        = string
+  default     = "dev"
 }
 # Business Division
 variable "owners" {
   description = "organization this Infrastructure belongs"
   type        = string
-  default     = ""
+  default     = "aws"
 }
 
 # VPC variables defined as below
@@ -94,4 +95,5 @@ variable "single_nat_gateway" {
 variable "cluster_name" {
   description = "EKS cluster name"
   type        = string
+  default     = "myEKScluster"
 }
