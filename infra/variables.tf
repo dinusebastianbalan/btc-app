@@ -91,11 +91,6 @@ variable "single_nat_gateway" {
 }
 
 
-variable "password" {
-  description = "Postgres Master password"
-  type        = string
-}
-
 variable "cluster_name" {
   description = "EKS cluster name"
   type        = string
