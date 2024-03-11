@@ -39,4 +39,4 @@ jobs:
 
     # Generates an execution plan for Terraform
     - name: Terraform Plan
-      run: terraform -chdir=infra plan -var-file=./terraform.tfvars -input=false
+      run: terraform -chdir=infra plan -input=false
