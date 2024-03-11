@@ -10,7 +10,6 @@ variable "region" {
 variable "environment" {
   description = "Environment Variable used as a prefix"
   type        = string
-  default     = ""
 }
 # Business Division
 variable "owners" {
@@ -92,26 +91,12 @@ variable "single_nat_gateway" {
 }
 
 
-# AWS Bastion EC2 Instance Type and key pair
-variable "instance_type" {
-  description = "bastion Instance Type"
-  type        = string
-  default     = ""
-}
-variable "instance_keypair" {
-  description = "AWS EC2 Key pair that need to be associated with bastion Instance"
-  type        = string
-  default     = ""
-}
-
 variable "password" {
   description = "Postgres Master password"
   type        = string
-  default     = ""
 }
 
 variable "cluster_name" {
   description = "EKS cluster name"
   type        = string
-  default     = ""
 }
