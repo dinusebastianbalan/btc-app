@@ -64,62 +64,6 @@ data "aws_ami" "amazon_linux_ami" {
   }
 }
 
-
-# Security Group for Public Bastion Host
-# https://registry.terraform.io/modules/terraform-aws-modules/security-group/aws/latest
-module "bastion_instance_sg" {
-  source  = "terraform-aws-modules/security-group/aws"
-  version = "5.1.0"
-
-  name        = "bastion-instance-sg-${local.name}"
-  description = "SSH port open, egress ports are all world open"
-  vpc_id      = module.vpc.vpc_id
-
-  # List of ingress rules and CIDR Block
-  ingress_rules       = ["ssh-tcp"]
-  ingress_cidr_blocks = ["0.0.0.0/0"]
-
-  # List of egress rules to create by name open to all-all
-  egress_rules = ["all-all"]
-  tags         = local.tags
-}
-
-
-data "aws_key_pair" "example" {
-  key_name = "seba-mac"
-}
-
-# Terraform Module for Bastion instance - bastion Instance that will be created in VPC Public Subnet
-# https://registry.terraform.io/modules/terraform-aws-modules/ec2-instance/aws/latest
-module "ec2_bastion_instance" {
-  source                 = "terraform-aws-modules/ec2-instance/aws"
-  version                = "5.2.0"
-  name                   = "Bastion-Instance-${local.name}"
-  ami                    = data.aws_ami.amazon_linux_ami.id
-  instance_type          = var.instance_type
-  subnet_id              = module.vpc.public_subnets[0]
-  vpc_security_group_ids = [module.bastion_instance_sg.security_group_id]
-  key_name               = data.aws_key_pair.example.key_name
-  tags                   = local.tags
-  depends_on = [
-    module.vpc
-  ]
-}
-
-
-# Elastic IP for Bastion Instance
-# https://registry.terraform.io/providers/hashicorp/aws/2.42.0/docs/resources/eip
-resource "aws_eip" "bastion_instance_eip" {
-  #   vpc      = true
-  domain   = "vpc" # vpc argument to the aws_eip resource is deprecated
-  instance = module.ec2_bastion_instance.id
-  tags     = local.tags
-  depends_on = [
-    module.ec2_bastion_instance,
-    module.vpc
-  ]
-}
-
 resource "aws_security_group" "rds_sg" {
   name   = "rds_sg"
   vpc_id = module.vpc.vpc_id
