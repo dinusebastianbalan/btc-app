@@ -54,27 +54,6 @@ variable "private_subnets" {
   type        = list(string)
   default     = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
 }
-# VPC Database Subnets
-variable "database_subnets" {
-  description = "A list of database subnets inside the VPC"
-  type        = list(string)
-  default     = ["10.0.151.0/24", "10.0.152.0/24", "10.0.153.0/24"]
-}
-
-# VPC Create Database Subnet Group (True / False)
-variable "create_database_subnet_group" {
-  description = "VPC Create Database Subnet Group, Controls if database subnet group should be created"
-  type        = bool
-  default     = true
-}
-
-# VPC Create Database Subnet Route Table (True or False)
-variable "create_database_subnet_route_table" {
-  description = "VPC Create Database Subnet Route Table, Controls if separate route table for database should be created"
-  type        = bool
-  default     = true
-}
-
 
 # VPC Enable NAT Gateway (True or False) 
 variable "enable_nat_gateway" {
@@ -89,7 +68,6 @@ variable "single_nat_gateway" {
   type        = bool
   default     = true
 }
-
 
 variable "cluster_name" {
   description = "EKS cluster name"

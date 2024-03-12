@@ -2,4 +2,4 @@ FROM python:3
 ADD requirements.txt /
 RUN pip3 install -r requirements.txt
 ADD app.py /
-CMD [ "python", "./app.py" ]
+CMD [ "python", "./api.py" ]

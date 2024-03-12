@@ -5,21 +5,17 @@
 replicaCount: 1
 selector:
   matchLabels:
-    service: "birthdayapp"
+    service: "serviceA"
 image:
   registry: "075948657693.dkr.ecr.us-east-1.amazonaws.com"
-  repository: "075948657693.dkr.ecr.us-east-1.amazonaws.com/my-birthday-app-dev"
+  repository: "075948657693.dkr.ecr.us-east-1.amazonaws.com/my-ecr"
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v0.0.2"
+  tag: "v0.0.1"
 
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
-
-db_endpoint: "myrdsinstance.cczeocclwg0h.us-east-1.rds.amazonaws.com"
-db_name: "store"
-db_user: "postgres"
 
 
 serviceAccount:
