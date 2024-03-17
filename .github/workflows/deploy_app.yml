@@ -30,7 +30,7 @@ jobs:
         curl -LO https://dl.k8s.io/release/v1.23.6/bin/linux/amd64/kubectl
         sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
         kubectl version --client
-        aws eks update-kubeconfig --region us-east-1 --name myEKScluster
+        aws eks update-kubeconfig --region us-east-1 --name myEksCluster
         kubectl get namespace
 
     - name: helm install
