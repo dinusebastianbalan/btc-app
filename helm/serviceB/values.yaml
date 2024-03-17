@@ -8,7 +8,7 @@ selector:
     service: "serviceB"
 image:
   registry: "075948657693.dkr.ecr.us-east-1.amazonaws.com"
-  repository: "075948657693.dkr.ecr.us-east-1.amazonaws.com/my-ecr"
+  repository: "075948657693.dkr.ecr.us-east-1.amazonaws.com/my-ecr-api"
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "v0.0.1"
