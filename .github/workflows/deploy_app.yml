@@ -42,7 +42,9 @@ jobs:
 
     - name: helm install ingress gateway
       run: |
-        kubectl get namespace gateway &>/dev/null || kubectl create namespace gateway; pwd; helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+        ls
+        kubectl get namespace gateway &>/dev/null || kubectl create namespace gateway; 
+        kubectl get namespace gateway &>/dev/null || helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
         kubectl get namespace gateway &>/dev/null || helm install gateway ingress-nginx/ingress-nginx \
         --namespace gateway \
         --set controller.metrics.enabled=true \
@@ -51,9 +53,9 @@ jobs:
 
     - name: helm install btc
       run: |
-        helm upgrade --install serviceB ./serviceB/ -f serviceB/values.yaml
+        cd helm; helm upgrade --install serviceB ./serviceB/ -f serviceB/values.yaml
 
     - name: helm install api
       run: |
-        helm upgrade --install serviceB ./serviceB/ -f serviceB/values.yaml
+        cd helm; helm upgrade --install serviceB ./serviceB/ -f serviceB/values.yaml
         kubectl apply -f ingress.yaml
