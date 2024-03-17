@@ -35,28 +35,6 @@ module "vpc" {
   map_public_ip_on_launch = true
 }
 
-
-data "aws_ami" "amazon_linux_ami" {
-  most_recent = true
-  owners      = ["amazon"]
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-kernel-*-gp2"]
-  }
-  filter {
-    name   = "root-device-type"
-    values = ["ebs"]
-  }
-  filter {
-    name   = "architecture"
-    values = ["x86_64"]
-  }
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-}
-
 resource "aws_ecr_repository" "my_ecr" {
   name = "my-ecr"
 }
@@ -73,6 +51,9 @@ module "eks" {
   node_security_group_tags = {
     "kubernetes.io/cluster/${var.cluster_name}" = null
   }
+  # Cluster access entry
+  # To add the current caller identity as an administrator
+  enable_cluster_creator_admin_permissions = true
 }
 
 module "eks_managed_node_group" {
