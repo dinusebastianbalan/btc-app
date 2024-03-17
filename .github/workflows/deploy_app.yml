@@ -1,4 +1,4 @@
-name: 'Deploy Birthday App'
+name: 'Deploy Btc and API App'
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   terraform:
-    name: 'Deploy Birthday App'
+    name: 'Deploy Btc and API App'
     runs-on: ubuntu-latest
 
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
@@ -32,6 +32,15 @@ jobs:
         kubectl version --client
         aws eks update-kubeconfig --region us-east-1 --name testcluster
         kubectl get namespace
+
+    - name: helm install app
+      run: |
+        curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+        chmod 700 get_helm.sh
+        ./get_helm.sh
+        helm version
+        cd helm; helm upgrade --install birthdayapp ./birthdayapp/ -f birthdayapp/values.yaml
+        kubectl apply -f ingress.yaml
 
     - name: helm install app
       run: |
