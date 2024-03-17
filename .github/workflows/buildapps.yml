@@ -29,10 +29,10 @@ jobs:
       run: |
         export DOCKER_IMAGE_TAG=v0.0.1
         cd serviceA; docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/my-ecr-btc:$DOCKER_IMAGE_TAG .
-        docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/my-ecr:$DOCKER_IMAGE_TAG
+        docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/my-ecr-btc:$DOCKER_IMAGE_TAG
 
     - name: Build and tag the Docker image for Rest API
       run: |
         export DOCKER_IMAGE_TAG=v0.0.1
         cd aserviceB; docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/my-ecr-api:$DOCKER_IMAGE_TAG .
-        docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/my-ecr:$DOCKER_IMAGE_TAG
+        docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/my-ecr-api:$DOCKER_IMAGE_TAG
