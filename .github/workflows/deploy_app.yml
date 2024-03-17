@@ -42,7 +42,8 @@ jobs:
 
     - name: helm install ingress gateway
       run: |
-        helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+        kubectl get namespace gateway &>/dev/null || helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+        kubectl create namespace gateway
         pwd
         helm install gateway ingress-nginx/ingress-nginx \
         --namespace gateway \
