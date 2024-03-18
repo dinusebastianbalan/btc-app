@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: example-ingress
+  name: ingress-api
 spec:
   ingressClassName: nginx
   rules:
@@ -13,4 +13,4 @@ spec:
           service:
             name: service-api
             port:
-              number: 5000
+              number: 5555
