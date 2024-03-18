@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "birthdayapp.name" -}}
+{{- define "service-api.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "birthdayapp.fullname" -}}
+{{- define "service-api.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "birthdayapp.chart" -}}
+{{- define "service-api.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "birthdayapp.labels" -}}
-helm.sh/chart: {{ include "birthdayapp.chart" . }}
-{{ include "birthdayapp.selectorLabels" . }}
+{{- define "service-api.labels" -}}
+helm.sh/chart: {{ include "service-api.chart" . }}
+{{ include "service-api.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,17 +45,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "birthdayapp.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "birthdayapp.name" . }}
+{{- define "service-api.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "service-api.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "birthdayapp.serviceAccountName" -}}
+{{- define "service-api.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "birthdayapp.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "service-api.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
