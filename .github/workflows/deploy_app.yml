@@ -75,6 +75,7 @@ jobs:
               }
             }]
           }
+          '
 
     - name: helm install btc
       run: |
