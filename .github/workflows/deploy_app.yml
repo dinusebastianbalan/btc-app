@@ -46,9 +46,9 @@ jobs:
     - name: helm install ingress gateway
       run: |
         ls
-        kubectl get namespace gateway &>/dev/null || kubectl create namespace gateway; 
-        kubectl get namespace gateway &>/dev/null || helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-        kubectl get namespace gateway &>/dev/null || helm install gateway ingress-nginx/ingress-nginx \
+        kubectl create namespace gateway; 
+        helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+        helm install gateway ingress-nginx/ingress-nginx \
         --namespace gateway \
         --set controller.metrics.enabled=true \
         --set-string controller.metrics.service.annotations."prometheus\.io/port"="10254" \
