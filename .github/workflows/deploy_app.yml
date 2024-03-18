@@ -57,8 +57,9 @@ jobs:
     - name: helm install btc
       run: |
         cd helm; helm upgrade --install service-btc ./service-btc/ -f service-btc/values.yaml
+        cd service-btc; kubectl apply -f ingress-btc-avg.yaml; kubectl apply -f ingress-btc-current.yaml
 
     - name: helm install api
       run: |
         cd helm; helm upgrade --install service-api ./service-api/ -f service-api/values.yaml
-        kubectl apply -f ingress.yaml
+        cd service-api; kubectl apply -f ingress.yaml
