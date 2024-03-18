@@ -43,16 +43,38 @@ jobs:
         ./get_helm.sh
         helm version
 
-    - name: helm install ingress gateway
+    # - name: helm install ingress gateway
+    #   run: |
+    #     ls
+    #     kubectl create namespace gateway; 
+    #     helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+    #     helm install gateway ingress-nginx/ingress-nginx \
+    #     --namespace gateway \
+    #     --set controller.metrics.enabled=true \
+    #     --set-string controller.metrics.service.annotations."prometheus\.io/port"="10254" \
+    #     --set-string controller.metrics.service.annotations."prometheus\.io/scrape"="true"
+
+    - name: create record set
       run: |
-        ls
-        kubectl create namespace gateway; 
-        helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-        helm install gateway ingress-nginx/ingress-nginx \
-        --namespace gateway \
-        --set controller.metrics.enabled=true \
-        --set-string controller.metrics.service.annotations."prometheus\.io/port"="10254" \
-        --set-string controller.metrics.service.annotations."prometheus\.io/scrape"="true"
+        ENV=dev
+        DNS=$(kubectl get svc gateway-ingress-nginx-controller -n gateway -o=jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+        aws route53 change-resource-record-sets \
+          --hosted-zone-id Z09234951AEEIVS7X82OY \
+          --change-batch '
+          {
+            "Comment": "Testing creating a record set"
+            ,"Changes": [{
+              "Action"              : "CREATE"
+              ,"ResourceRecordSet"  : {
+                "Name"              : "'" $ENV "'.sebastianbalan.com"
+                ,"Type"             : "CNAME"
+                ,"TTL"              : 120
+                ,"ResourceRecords"  : [{
+                    "Value"         : "'" $DNS "'"
+                }]
+              }
+            }]
+          }
 
     - name: helm install btc
       run: |
