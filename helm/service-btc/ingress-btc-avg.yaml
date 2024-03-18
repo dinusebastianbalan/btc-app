@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: example-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - path: /average_price
+        pathType: Prefix
+        backend:
+          service:
+            name: service-btc
+            port:
+              number: 33133

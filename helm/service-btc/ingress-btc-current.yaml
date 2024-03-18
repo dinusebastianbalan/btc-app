@@ -7,10 +7,10 @@ spec:
   rules:
   - http:
       paths:
-      - path: /
+      - path: /current_price
         pathType: Prefix
         backend:
           service:
-            name: serviceB
+            name: service-btc
             port:
-              number: 5000
+              number: 33133
