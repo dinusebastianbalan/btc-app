@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Docker build BTC & API apps CI
 
 on:
   pull_request:
