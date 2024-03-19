@@ -1,0 +1,90 @@
+name: 'Deploy apps and configs'
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+    - 'helm/**'
+  workflow_dispatch:
+
+jobs:
+  terraform:
+    name: 'Deploy Btc and API App'
+    runs-on: ubuntu-latest
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Install Kubectl and get context
+      run: |
+        curl -LO https://dl.k8s.io/release/v1.23.6/bin/linux/amd64/kubectl
+        sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+        kubectl version --client
+        aws eks update-kubeconfig --region us-east-1 --name myEKScluster
+        kubectl get namespace
+    - name: helm install
+      run: |
+        curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+        chmod 700 get_helm.sh
+        ./get_helm.sh
+        helm version
+    - name: helm install ingress gateway
+      run: |
+        kubectl create namespace gateway; kubectl label namespaces gateway purpose=allowed
+        helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+        helm install gateway ingress-nginx/ingress-nginx \
+        --namespace gateway \
+        --set controller.metrics.enabled=true \
+        --set-string controller.metrics.service.annotations."prometheus\.io/port"="10254" \
+        --set-string controller.metrics.service.annotations."prometheus\.io/scrape"="true"
+
+    - name: create record set
+      run: |
+        ENV=dev
+        DNS=$(kubectl get svc gateway-ingress-nginx-controller -n gateway -o=jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+        aws route53 change-resource-record-sets --hosted-zone-id Z09234951AEEIVS7X82OY --change-batch file://<(cat << EOF
+        {
+          "Comment": "Testing creating a record set",
+          "Changes": [
+            {
+              "Action": "CREATE",
+              "ResourceRecordSet": {
+                "Name": "${ENV}.sebastianbalan.com",
+                "Type": "CNAME",
+                "TTL": 120,
+                "ResourceRecords": [
+                  {
+                    "Value": "${DNS}"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+        EOF
+        )
+
+    - name: helm install btc
+      run: |
+        kubectl create namespace backend; 
+        cd helm; helm upgrade --install --namespace backend service-btc ./service-btc/ -f service-btc/values.yaml
+        cd service-btc; kubectl apply -f ingress-btc-avg.yaml; kubectl apply -f ingress-btc-current.yaml
+
+    - name: helm install api
+      run: |
+        kubectl create namespace frontend; kubectl label namespaces backend purpose=restricted
+        cd helm; helm upgrade --install --namespace frontend service-api ./service-api/ -f service-api/values.yaml
+        cd service-api; kubectl apply -f ingress.yaml; kubectl apply -f default-deny-frontend.yaml; kubectl apply -f allow-gateway-ns.yaml
