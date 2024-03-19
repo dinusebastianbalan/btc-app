@@ -4,7 +4,8 @@ on:
   pull_request:
     branches: [ "main" ]
     paths:
-    - 'app/**'
+    - 'service-api/**'
+    - 'service-btc/**'
   workflow_dispatch:
 
 jobs:

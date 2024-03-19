@@ -5,7 +5,7 @@ import datetime
 
 app = Flask(__name__)
 
-# This list will hold the last 60 price values, one for each 10-second interval in the last 10 minutes
+# This list will hold the last 60 price values, one for each 10-second interval in the last 10 minutes.
 bitcoin_prices = []
 
 def fetch_bitcoin_price():
