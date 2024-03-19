@@ -7,19 +7,50 @@ on:
     - 'helm/**'
   workflow_dispatch:
 
+
 jobs:
-  terraform:
-    name: 'Deploy Btc and API App'
+  check-namespace:
+    runs-on: ubuntu-latest
+    outputs:
+      exists: ${{ steps.check-ns.outputs.exists }}
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Install Kubectl and get context
+      run: |
+        curl -LO https://dl.k8s.io/release/v1.23.6/bin/linux/amd64/kubectl
+        sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+        kubectl version --client
+        aws eks update-kubeconfig --region us-east-1 --name myEKScluster
+
+    - name: Check if Kubernetes Namespace Exists
+      id: check-ns
+      run: |
+        if kubectl get namespace gateway; then
+          echo "::set-output name=exists::true"
+        else
+          echo "::set-output name=exists::false"
+        fi
+
+  prereq:
+    needs: check-namespace
+    name: 'Deploy namespace and ingress'
+    if: needs.check-namespace.outputs.exists == 'false'
     runs-on: ubuntu-latest
 
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
       run:
         shell: bash
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
@@ -42,18 +73,80 @@ jobs:
         chmod 700 get_helm.sh
         ./get_helm.sh
         helm version
-
-    - name: helm install ingress gateway
+    
+    - name: kubectl create NS and labels and add repo
       run: |
+        kubectl create namespace frontend
+        kubectl create namespace backend
+        kubectl label namespaces backend purpose=restricted
         kubectl create namespace gateway
         kubectl label namespaces backend purpose=allowed 
         helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-        helm install gateway ingress-nginx/ingress-nginx \
+
+
+  deploy-apps:
+    runs-on: ubuntu-latest
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+      
+    - name: helm install ingress gateway
+      run: |
+        helm upgrade --install gateway ingress-nginx/ingress-nginx \
         --namespace gateway \
         --set controller.metrics.enabled=true \
         --set-string controller.metrics.service.annotations."prometheus\.io/port"="10254" \
         --set-string controller.metrics.service.annotations."prometheus\.io/scrape"="true"
 
+    - name: helm install btc service
+      run: |
+        cd helm; helm upgrade --install --namespace backend service-btc ./service-btc/ -f service-btc/values.yaml
+        cd service-btc; kubectl apply -f ingress-btc-avg.yaml; kubectl apply -f ingress-btc-current.yaml
+
+    - name: helm install api service
+      run: |
+        cd helm; helm upgrade --install --namespace frontend service-api ./service-api/ -f service-api/values.yaml
+        cd service-api; kubectl apply -f ingress.yaml; kubectl apply -f default-deny-frontend.yaml; kubectl apply -f allow-gateway-ns.yaml
+
+
+  check-record:
+    runs-on: ubuntu-latest
+    outputs:
+      exists: ${{ steps.check-ns.outputs.exists }}
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+
+    - name: Check if Kubernetes Namespace Exists
+      id: check-dns
+      run: |
+        if kubectl get svc gateway-ingress-nginx-controller -n gateway -o=jsonpath='{.status.loadBalancer.ingress[0].hostname}'; then
+          echo "::set-output name=exists::true"
+        else
+          echo "::set-output name=exists::false"
+        fi
+
+  create-record:
+    runs-on: ubuntu-latest
+    needs: check-record
+    outputs:
+      exists: ${{ steps.check-dns.outputs.exists }}
     - name: create record set
       run: |
         ENV=dev
@@ -79,16 +172,3 @@ jobs:
         }
         EOF
         )
-
-    - name: helm install btc
-      run: |
-        kubectl create namespace backend
-        kubectl label namespaces backend purpose=restricted
-        cd helm; helm upgrade --install --namespace backend service-btc ./service-btc/ -f service-btc/values.yaml
-        cd service-btc; kubectl apply -f ingress-btc-avg.yaml; kubectl apply -f ingress-btc-current.yaml
-
-    - name: helm install api
-      run: |
-        kubectl create namespace frontend
-        cd helm; helm upgrade --install --namespace frontend service-api ./service-api/ -f service-api/values.yaml
-        cd service-api; kubectl apply -f ingress.yaml; kubectl apply -f default-deny-frontend.yaml; kubectl apply -f allow-gateway-ns.yaml
