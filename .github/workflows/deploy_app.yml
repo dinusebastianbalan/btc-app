@@ -81,12 +81,12 @@ jobs:
 
     - name: helm install btc
       run: |
-        helm create namespace backend;
+        kubectl create namespace backend;
         cd helm; helm upgrade --install --namespace backend service-btc ./service-btc/ -f service-btc/values.yaml
         cd service-btc; kubectl apply -f ingress-btc-avg.yaml; kubectl apply -f ingress-btc-current.yaml
 
     - name: helm install api
       run: |
-        helm create namespace frontend;
+        kubectl create namespace frontend;
         cd helm; helm upgrade --install --namespace frontend service-api ./service-api/ -f service-api/values.yaml
         cd service-api; kubectl apply -f ingress.yaml
