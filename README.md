@@ -12,7 +12,7 @@ The Cluster should have 2 services deployed – Service A and Service B:
 
 
 AWS components :
-- VPC (1 subnets, 1 private/1 public)
+- VPC (2 subnets, 1 private/1 public)
 - ECR (for storing application docker image in ECR repository)
 - IAM policies
 - EKS with the following specs:
@@ -50,10 +50,11 @@ This job performs a terraform apply based on the configuration files from infra 
 4. name: 'Deploy apps and configs'
 - trigger on Merge event/push to main branch or manually from Github Actions UI, main
 branch
-This job deploys the main application and configures other settings such as label k8s namespaces; network policy; DNS records.
+This job deploys the main applications, ingress controller and configures other settings such as label k8s namespaces; network policy; DNS records.
 
 
 Example:
+
 Current price of BTC
 http://dev.sebastianbalan.com/current_price
 
