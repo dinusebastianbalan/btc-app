@@ -7,7 +7,7 @@ The Cluster should have 2 services deployed – Service A and Service B:
   - Average value over the last 10 minutes.
 - Service API is a REST API service, which exposes a single controller that responds 200 status code on GET requests.
 - NGINX Ingress controller deployed, and corresponding ingress rules for Service BTC and Service API.
-- Service BTC can not be able to communicate with Service API.
+- Service BTC cannot be able to communicate with Service API.
 
 
 
@@ -22,9 +22,16 @@ AWS components :
 - S3 (storage)
 - Route53 (DNS records for domain)
 
-The terraform backend state is configured in S3 bucket.
-The network policy is constructed on the frontend namespace, with a default deny from evrything and a allow from gateway namespace (thus blocking backend requests)
+General info: 
 
+- The terraform backend state is configured in S3 bucket.
+- The network policy is constructed on the frontend namespace, with a default deny from evrything ( helm/service-api/allow-gateway-ns.yaml) and a allow from gateway namespace (helm/service-api/default-deny-frontend.yaml) (thus blocking backend requests)
+- Services are exposed to internet trough ingress resources
+  - service-api (5555 port) : helm/service-api/ingress.yaml
+  - service-btc (33133 port): helm/service-btc/ingress-btc-avg.yaml; helm/service-btc/ingress-btc-avg.yaml
+
+Helm/deployment
+- custom helm charts for each microservices have been created.
 
 Github Workflows :
 1. name: Docker Image CI
