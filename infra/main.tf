@@ -62,33 +62,33 @@ module "eks" {
 
 }
 
-# module "eks_managed_node_group" {
-#   source = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
+module "eks_managed_node_group" {
+  source = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
 
-#   name            = "separate-eks-mng"
-#   cluster_name    = module.eks.cluster_name
-#   cluster_version = "1.29"
+  name            = "separate-eks-mng"
+  cluster_name    = module.eks.cluster_name
+  cluster_version = "1.29"
 
-#   subnet_ids = module.vpc.private_subnets
+  subnet_ids = module.vpc.private_subnets
 
-#   cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
-#   vpc_security_group_ids            = [module.eks.node_security_group_id]
+  cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
+  vpc_security_group_ids            = [module.eks.node_security_group_id]
 
-#   min_size     = 2
-#   max_size     = 10
-#   desired_size = 2
+  min_size     = 2
+  max_size     = 10
+  desired_size = 2
 
-#   instance_types = ["t3.medium"]
-#   capacity_type  = "ON_DEMAND"
+  instance_types = ["t3.medium"]
+  capacity_type  = "ON_DEMAND"
 
-#   labels = {
-#     Environment = "test"
-#     GithubRepo  = "terraform-aws-eks"
-#     GithubOrg   = "terraform-aws-modules"
-#   }
+  labels = {
+    Environment = "test"
+    GithubRepo  = "terraform-aws-eks"
+    GithubOrg   = "terraform-aws-modules"
+  }
 
-#   tags = {
-#     Environment = "dev"
-#     Terraform   = "true"
-#   }
-# }
+  tags = {
+    Environment = "dev"
+    Terraform   = "true"
+  }
+}
