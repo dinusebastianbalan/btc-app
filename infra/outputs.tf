@@ -38,8 +38,3 @@ output "cluster_name" {
   description = "The name of the EKS cluster"
   value       = module.eks.cluster_name
 }
-
-
-output "kubeconfig" {
-  value = abspath("${path.root}/${local_file.kubeconfig.filename}")
-}
