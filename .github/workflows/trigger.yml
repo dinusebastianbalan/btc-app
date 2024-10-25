@@ -21,4 +21,4 @@ jobs:
             -H "Accept: application/vnd.github.v3+json" \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             https://api.github.com/repos/dinusebastianbalan/aws-app/dispatches \
-            -d '{"event_type":"trigger-action"}'
+            -d '{"event_type":"trigger-action", "client_payload": {"message": "Hello from dispatch!"}}'
