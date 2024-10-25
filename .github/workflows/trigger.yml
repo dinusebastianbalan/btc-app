@@ -1,0 +1,24 @@
+# .github/workflows/workflow-1.yml
+name: Workflow 1
+
+on:
+  workflow_dispatch:  
+  
+jobs:
+  initial_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Perform some tasks
+        run: echo "Running Workflow 1..."
+
+      # Trigger Workflow 1
+      - name: Trigger Workflow 2
+        run: |
+          curl -X POST \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/dinusebastianbalan/aws-app/dispatches \
+            -d '{"event_type":"trigger-action"}'
