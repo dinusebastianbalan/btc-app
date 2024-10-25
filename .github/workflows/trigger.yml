@@ -19,6 +19,6 @@ jobs:
         run: |
           curl -X POST \
             -H "Accept: application/vnd.github.v3+json" \
-            -H "Authorization: token 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" \
+            -H "Authorization: token ${{ secrets.PAT }}" \
             https://api.github.com/repos/dinusebastianbalan/aws-app/dispatches \
-            -d '{"event_type":"trigger-action", "client_payload": {"message": "Hello from dispatch!"}}'
+            -d '{"event_type":"trigger-action", "client_payload": {"message": "Hello from dispatch from another workflow!"}}'
