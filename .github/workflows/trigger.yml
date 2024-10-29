@@ -2,7 +2,19 @@
 name: Workflow 1
 
 on:
-  workflow_dispatch:  
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Environment
+        required: true
+        type: choice
+        options:
+          - dev-blackcloak-customer-exp
+          - qa-blackcloak-customer-exp
+          - stg-blackcloak-customer-exp
+      tag:
+        description: Tag Used for docker image
+        required: true
   
 jobs:
   initial_job:
@@ -21,4 +33,4 @@ jobs:
             -H "Accept: application/vnd.github.v3+json" \
             -H "Authorization: token ${{ secrets.PAT }}" \
             https://api.github.com/repos/dinusebastianbalan/aws-app/dispatches \
-            -d '{"event_type":"trigger-action", "client_payload": {"message": "Hello from dispatch from another workflow!"}}'
+            -d '{"event_type":"trigger-action", "client_payload": {"env": "${{ github.event.inputs.environment }}", "tag": "${{ github.event.inputs.tag }}"}}'
